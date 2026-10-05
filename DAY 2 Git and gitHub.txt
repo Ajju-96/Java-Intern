@@ -1,0 +1,26 @@
+# 1. Initialize a new local Git repository
+git init
+
+# 2. Stage changes (Working Directory -> Staging Area)
+git add .
+
+# 3. Check status of staged/unstaged files
+git status
+
+# 4. Commit changes (Staging Area -> Local Repository)
+git commit -m "my first commit"
+
+# 5. Connect local repository to remote GitHub repository
+git remote add origin <REMOTE_REPOSITORY_URL>
+
+# 6. Rename current branch to main (optional/standard)
+git branch -M main
+
+# 7. Push changes to remote server (Local Repository -> Remote Repository)
+git push -u origin main
+
+Quick Cheat Sheet
+
+[ Working Directory ]   --->   git add .               --->   [ Staging Area ]
+[ Staging Area ]        --->   git commit -m "msg"     --->   [ Local Repository ]
+[ Local Repository ]    --->   git push -u origin main --->   [ Remote Repository ]
