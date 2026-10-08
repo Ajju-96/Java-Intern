@@ -56,7 +56,6 @@ class CoffeeWallet{
         System.out.println("Your account total balance was: "+ balance);
     }
 
-
 }
 public class Wallet {
     public static void main(String[] args){
