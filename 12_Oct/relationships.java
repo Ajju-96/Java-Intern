@@ -1,4 +1,4 @@
-
+// IS-A relation ..Example
 
 class Engine{
     void start(){

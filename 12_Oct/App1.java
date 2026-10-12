@@ -1,3 +1,5 @@
+// has with one class .. Example
+
 public class App1 {
     public static void main(String[] args){
         Address home1 = new Address("Mumbai", "MH", 414001);
