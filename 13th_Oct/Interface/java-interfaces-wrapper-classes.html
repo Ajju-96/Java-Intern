@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Java: Interfaces and Wrapper Classes</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{--bg:#f6f7f9;--ink:#1d2433;--mute:#566074;--line:#d9dde5;--acc:#0e7c86;--accbg:#e3f3f4;--warn:#9a5b00;--warnbg:#fff3dc;--code:#0f1b2d;--codeink:#e6edf7;--card:#fff}
+@media(prefers-color-scheme:dark){:root{--bg:#10151f;--ink:#e6e9ef;--mute:#9aa4b6;--line:#2a3345;--acc:#4cc3cd;--accbg:#12303a;--warn:#f0b35a;--warnbg:#3a2c12;--code:#070d17;--card:#171e2c}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.65 Newsreader,Georgia,serif}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+h1{font-size:2.4rem;line-height:1.15;margin:.2em 0 .3em}
+h2{font-size:1.7rem;margin:2.2em 0 .5em;padding-top:.6em;border-top:2px solid var(--ink)}
+h3{font-size:1.25rem;margin:1.8em 0 .4em;color:var(--acc)}
+p,li{max-width:70ch}
+code,pre{font-family:"JetBrains Mono",Consolas,monospace;font-size:.82rem}
+:not(pre)>code{background:var(--accbg);padding:.1em .35em;border-radius:4px}
+pre{background:var(--code);color:var(--codeink);padding:14px 16px;border-radius:8px;overflow-x:auto;line-height:1.55;margin:1em 0}
+.k{color:#7cc4ff}.s{color:#a5e08a}.c{color:#7f8da6;font-style:italic}.t{color:#f2b872}
+nav{display:flex;flex-wrap:wrap;gap:6px 14px;margin:18px 0 8px;font:600 .9rem system-ui,sans-serif}
+nav a{color:var(--acc);text-decoration:none}nav a:hover,nav a:focus-visible{text-decoration:underline}
+.lead{color:var(--mute);font-size:1.1rem}
+.note,.warn{padding:12px 16px;border-radius:8px;margin:1.2em 0;border-left:4px solid var(--acc);background:var(--accbg)}
+.warn{border-color:var(--warn);background:var(--warnbg)}
+.note b,.warn b{font-family:system-ui,sans-serif;font-size:.9rem}
+table{border-collapse:collapse;width:100%;margin:1em 0;font:.92rem/1.45 system-ui,sans-serif;background:var(--card)}
+.tw{overflow-x:auto}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--accbg)}
+.practice{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 20px 14px;margin:1.8em 0}
+.practice h3{margin-top:.8em}
+details{margin:.5em 0}summary{cursor:pointer;color:var(--acc);font:600 .9rem system-ui,sans-serif}
+summary:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+li{margin:.3em 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Java: Interfaces and Wrapper Classes</h1>
+<p class="lead">A teaching guide for undergraduates preparing for placement interviews. Each part ends with practice questions; answers are hidden until you click them.</p>
+<nav>
+<a href="#i1">Interfaces: the idea</a><a href="#i2">Syntax and rules</a><a href="#i3">Multiple inheritance</a><a href="#i4">Default, static, private methods</a><a href="#i5">Functional interfaces</a><a href="#i6">Interface vs abstract class</a><a href="#w1">Wrapper classes</a><a href="#w2">Boxing and unboxing</a><a href="#w3">Useful methods</a><a href="#w4">Integer cache trap</a>
+</nav>
+
+<h2 id="part1">Part 1: Interfaces</h2>
+
+<h3 id="i1">1. What an interface is</h3>
+<p>An interface is a contract. It lists what a class <em>can do</em> (method signatures) without saying <em>how</em>. Any class that <code>implements</code> the interface promises to provide those methods. Code that depends on the interface does not care which class is behind it, which is what makes programs easy to extend and test.</p>
+<p>Real-life picture: a power socket. The socket (interface) defines the shape of the plug. A lamp, a phone charger and a laptop can all plug in because each one follows the same contract.</p>
+<pre><span class="k">interface</span> <span class="t">Payment</span> {
+    <span class="k">void</span> pay(<span class="k">double</span> amount);      <span class="c">// implicitly public abstract</span>
+}
+
+<span class="k">class</span> <span class="t">UpiPayment</span> <span class="k">implements</span> <span class="t">Payment</span> {
+    <span class="k">public void</span> pay(<span class="k">double</span> amount) {
+        System.out.println(<span class="s">"Paid "</span> + amount + <span class="s">" via UPI"</span>);
+    }
+}
+
+<span class="k">class</span> <span class="t">CardPayment</span> <span class="k">implements</span> <span class="t">Payment</span> {
+    <span class="k">public void</span> pay(<span class="k">double</span> amount) {
+        System.out.println(<span class="s">"Paid "</span> + amount + <span class="s">" by card"</span>);
+    }
+}
+
+<span class="k">public class</span> <span class="t">Main</span> {
+    <span class="k">public static void</span> main(String[] args) {
+        <span class="t">Payment</span> p = <span class="k">new</span> UpiPayment();   <span class="c">// reference type = interface</span>
+        p.pay(499.0);
+        p = <span class="k">new</span> CardPayment();            <span class="c">// swap behaviour, caller unchanged</span>
+        p.pay(499.0);
+    }
+}</pre>
+<p>This is <strong>runtime polymorphism</strong>: the method that runs depends on the actual object, not on the variable's declared type.</p>
+
+<h3 id="i2">2. Syntax and rules</h3>
+<ul>
+<li>Methods are <code>public abstract</code> by default, even if you do not write the keywords.</li>
+<li>Variables are <code>public static final</code> by default, so they are constants and must be initialised.</li>
+<li>An interface cannot be instantiated: <code>new Payment()</code> is a compile error (except via an anonymous class or lambda).</li>
+<li>An interface has no constructors.</li>
+<li>A class uses <code>implements</code>; an interface extends another interface with <code>extends</code>.</li>
+<li>A non-abstract class must implement <strong>every</strong> abstract method, and the implementation must be <code>public</code>. Weakening access is an error.</li>
+<li>An abstract class may implement only some methods and leave the rest to its subclasses.</li>
+</ul>
+<pre><span class="k">interface</span> <span class="t">Shape</span> {
+    <span class="k">double</span> PI = 3.14159;           <span class="c">// public static final</span>
+    <span class="k">double</span> area();
+}
+<span class="k">class</span> <span class="t">Circle</span> <span class="k">implements</span> <span class="t">Shape</span> {
+    <span class="k">double</span> r;
+    Circle(<span class="k">double</span> r) { <span class="k">this</span>.r = r; }
+    <span class="k">public double</span> area() { <span class="k">return</span> PI * r * r; }   <span class="c">// must be public</span>
+}</pre>
+
+<h3 id="i3">3. Multiple inheritance through interfaces</h3>
+<p>A Java class can extend only one class, but it can implement many interfaces. This gives you multiple inheritance of <em>type</em> without the ambiguity problems of multiple inheritance of <em>state</em>.</p>
+<pre><span class="k">interface</span> <span class="t">Flyable</span>  { <span class="k">void</span> fly(); }
+<span class="k">interface</span> <span class="t">Swimmable</span> { <span class="k">void</span> swim(); }
+
+<span class="k">class</span> <span class="t">Duck</span> <span class="k">implements</span> <span class="t">Flyable</span>, <span class="t">Swimmable</span> {
+    <span class="k">public void</span> fly()  { System.out.println(<span class="s">"Duck flies"</span>); }
+    <span class="k">public void</span> swim() { System.out.println(<span class="s">"Duck swims"</span>); }
+}</pre>
+<p>If two interfaces give a class the same <code>default</code> method, the compiler forces you to resolve it (see next section).</p>
+
+<h3 id="i4">4. default, static and private methods (Java 8 and 9)</h3>
+<p>Before Java 8, adding a method to an interface broke every class that implemented it. Java 8 added <code>default</code> methods so interfaces can evolve safely, and <code>static</code> methods for helpers. Java 9 added <code>private</code> methods so default methods can share code.</p>
+<pre><span class="k">interface</span> <span class="t">Logger</span> {
+    <span class="k">void</span> log(String msg);                          <span class="c">// abstract</span>
+
+    <span class="k">default void</span> warn(String msg) { log(<span class="s">"WARN: "</span> + msg); }   <span class="c">// inherited by implementers</span>
+
+    <span class="k">static</span> Logger console() {                      <span class="c">// called as Logger.console()</span>
+        <span class="k">return</span> m -> System.out.println(m);
+    }
+}
+
+<span class="k">interface</span> <span class="t">A</span> { <span class="k">default void</span> hi() { System.out.println(<span class="s">"A"</span>); } }
+<span class="k">interface</span> <span class="t">B</span> { <span class="k">default void</span> hi() { System.out.println(<span class="s">"B"</span>); } }
+<span class="k">class</span> <span class="t">C</span> <span class="k">implements</span> <span class="t">A</span>, <span class="t">B</span> {
+    <span class="k">public void</span> hi() { A.<span class="k">super</span>.hi(); }       <span class="c">// diamond problem: you must choose</span>
+}</pre>
+<div class="note"><b>Remember</b><br>Static interface methods are not inherited. Call them through the interface name, never through an object.</div>
+
+<h3 id="i5">5. Functional interfaces, lambdas and marker interfaces</h3>
+<p>A <strong>functional interface</strong> has exactly one abstract method. A lambda expression is a short way to supply that one method. The optional <code>@FunctionalInterface</code> annotation makes the compiler check the rule.</p>
+<pre><span class="k">@FunctionalInterface</span>
+<span class="k">interface</span> <span class="t">Operation</span> { <span class="k">int</span> apply(<span class="k">int</span> a, <span class="k">int</span> b); }
+
+<span class="k">public class</span> <span class="t">Calc</span> {
+    <span class="k">public static void</span> main(String[] args) {
+        <span class="t">Operation</span> add = (a, b) -> a + b;
+        <span class="t">Operation</span> mul = (a, b) -> a * b;
+        System.out.println(add.apply(3, 4));   <span class="c">// 7</span>
+        System.out.println(mul.apply(3, 4));   <span class="c">// 12</span>
+    }
+}</pre>
+<p>Built-in ones you should know: <code>Runnable</code>, <code>Comparator&lt;T&gt;</code>, <code>Predicate&lt;T&gt;</code>, <code>Function&lt;T,R&gt;</code>, <code>Consumer&lt;T&gt;</code>, <code>Supplier&lt;T&gt;</code>.</p>
+<p>A <strong>marker interface</strong> has no methods at all. It simply tags a class so the JVM or a library treats it specially. Examples: <code>Serializable</code>, <code>Cloneable</code>.</p>
+
+<h3 id="i6">6. Interface vs abstract class</h3>
+<div class="tw"><table>
+<tr><th>Point</th><th>Interface</th><th>Abstract class</th></tr>
+<tr><td>Inheritance</td><td>A class can implement many</td><td>A class can extend only one</td></tr>
+<tr><td>Fields</td><td>Only constants (<code>public static final</code>)</td><td>Any kind, including instance state</td></tr>
+<tr><td>Constructors</td><td>No</td><td>Yes (called through <code>super</code>)</td></tr>
+<tr><td>Methods</td><td>Abstract, default, static, private</td><td>Abstract and concrete, any access level</td></tr>
+<tr><td>Use when</td><td>Unrelated classes share a capability (<code>Comparable</code>)</td><td>Related classes share code and state (<code>Animal</code> to <code>Dog</code>)</td></tr>
+</table></div>
+
+<div class="practice">
+<h3>Practice: Interfaces</h3>
+<ol>
+<li>Write an interface <code>Vehicle</code> with <code>start()</code> and <code>stop()</code>. Implement it in <code>Car</code> and <code>Bike</code>, then call both through a <code>Vehicle[]</code> array.
+<details><summary>Answer</summary><pre><span class="k">Vehicle</span>[] vs = { <span class="k">new</span> Car(), <span class="k">new</span> Bike() };
+<span class="k">for</span> (<span class="t">Vehicle</span> v : vs) { v.start(); v.stop(); }</pre></details></li>
+<li>Will this compile? <code>interface X { int n; }</code>
+<details><summary>Answer</summary>No. Interface fields are implicitly <code>final</code>, so <code>n</code> must be initialised: <code>int n = 5;</code>.</details></li>
+<li>A class implements an interface method without the <code>public</code> keyword. What happens?
+<details><summary>Answer</summary>Compile error. The interface method is public, and an implementation cannot reduce visibility.</details></li>
+<li>Class <code>C</code> implements interfaces <code>A</code> and <code>B</code>, both with a default method <code>hi()</code>. What must <code>C</code> do?
+<details><summary>Answer</summary>Override <code>hi()</code>. Inside it, pick one with <code>A.super.hi()</code> or <code>B.super.hi()</code>, or write new behaviour.</details></li>
+<li>Write a lambda for a <code>Predicate&lt;String&gt;</code> that checks whether a string is empty.
+<details><summary>Answer</summary><code>Predicate&lt;String&gt; isEmpty = s -> s.isEmpty();</code></details></li>
+<li>Interview: when would you choose an abstract class over an interface?
+<details><summary>Answer</summary>When subclasses are closely related and need shared instance fields, constructors or partially implemented behaviour. Choose an interface when you only need to define a capability that unrelated classes can adopt.</details></li>
+</ol>
+</div>
+
+<h2 id="part2">Part 2: Wrapper Classes</h2>
+
+<h3 id="w1">1. What wrapper classes are</h3>
+<p>Java has 8 primitive types (<code>int</code>, <code>double</code>, and so on). They are fast but are not objects. Each has a matching class in <code>java.lang</code> that <em>wraps</em> the value inside an object.</p>
+<div class="tw"><table>
+<tr><th>Primitive</th><th>Wrapper</th><th>Primitive</th><th>Wrapper</th></tr>
+<tr><td><code>byte</code></td><td><code>Byte</code></td><td><code>long</code></td><td><code>Long</code></td></tr>
+<tr><td><code>short</code></td><td><code>Short</code></td><td><code>float</code></td><td><code>Float</code></td></tr>
+<tr><td><code>int</code></td><td><code>Integer</code></td><td><code>double</code></td><td><code>Double</code></td></tr>
+<tr><td><code>char</code></td><td><code>Character</code></td><td><code>boolean</code></td><td><code>Boolean</code></td></tr>
+</table></div>
+<p>You need them because:</p>
+<ul>
+<li><strong>Collections and generics</strong> only hold objects: <code>List&lt;int&gt;</code> is illegal, <code>List&lt;Integer&gt;</code> is fine.</li>
+<li>A wrapper can be <code>null</code>, which lets you represent "no value" (a missing age, for example).</li>
+<li>Wrappers carry helpful methods: parsing, comparing, converting, and constants such as <code>Integer.MAX_VALUE</code>.</li>
+</ul>
+<p>Wrapper objects are <strong>immutable</strong>: once created, the value inside never changes.</p>
+<pre>List&lt;Integer&gt; marks = <span class="k">new</span> ArrayList&lt;&gt;();
+marks.add(85);                       <span class="c">// int is auto-converted to Integer</span>
+marks.add(92);
+<span class="k">int</span> first = marks.get(0);          <span class="c">// Integer is auto-converted back to int</span></pre>
+
+<h3 id="w2">2. Boxing and unboxing</h3>
+<p><strong>Boxing</strong> converts a primitive to its wrapper. <strong>Unboxing</strong> does the reverse. Since Java 5 the compiler does both automatically (<strong>autoboxing</strong>).</p>
+<pre><span class="k">int</span> a = 10;
+<span class="t">Integer</span> b = a;                       <span class="c">// autoboxing  -> Integer.valueOf(a)</span>
+<span class="k">int</span> c = b;                           <span class="c">// auto-unboxing -> b.intValue()</span>
+
+<span class="t">Integer</span> x = Integer.valueOf(50);     <span class="c">// manual boxing (preferred)</span>
+<span class="k">int</span> y = x.intValue();               <span class="c">// manual unboxing</span>
+<span class="c">// new Integer(50) is deprecated: use valueOf</span></pre>
+<div class="warn"><b>Common bug: NullPointerException</b><br>Unboxing a <code>null</code> wrapper crashes at runtime.</div>
+<pre><span class="t">Integer</span> age = <span class="k">null</span>;
+<span class="k">int</span> n = age;      <span class="c">// NullPointerException</span></pre>
+<p>Autoboxing inside a loop also creates many throwaway objects, which slows hot code:</p>
+<pre><span class="t">Long</span> sum = 0L;                       <span class="c">// slow: boxes on every iteration</span>
+<span class="k">for</span> (<span class="k">int</span> i = 0; i &lt; 1_000_000; i++) sum += i;   <span class="c">// use long sum instead</span></pre>
+
+<h3 id="w3">3. Useful methods</h3>
+<pre><span class="c">// String to number (parsing)</span>
+<span class="k">int</span> n = Integer.parseInt(<span class="s">"123"</span>);
+<span class="k">double</span> d = Double.parseDouble(<span class="s">"3.14"</span>);
+<span class="c">// Integer.parseInt("abc") throws NumberFormatException</span>
+
+<span class="c">// Number to String</span>
+String s1 = Integer.toString(255);
+String bin = Integer.toBinaryString(10);     <span class="c">// "1010"</span>
+String hex = Integer.toHexString(255);       <span class="c">// "ff"</span>
+
+<span class="c">// Comparing and limits</span>
+Integer.compare(3, 7);                       <span class="c">// negative number (3 &lt; 7)</span>
+Integer.MAX_VALUE;  Integer.MIN_VALUE;       <span class="c">// 2147483647, -2147483648</span>
+Integer.sum(4, 5);  Math.max(4, 5);
+
+<span class="c">// Character helpers</span>
+Character.isDigit(<span class="s">'7'</span>);  Character.isLetter(<span class="s">'a'</span>);
+Character.toUpperCase(<span class="s">'a'</span>);          <span class="c">// 'A'</span>
+
+<span class="c">// Converting between types through the wrapper</span>
+Integer num = 42;
+num.doubleValue();                           <span class="c">// 42.0</span>
+num.equals(42);                              <span class="c">// true</span></pre>
+<p><code>valueOf</code> returns a wrapper object; <code>parseXxx</code> returns a primitive. Both accept a String.</p>
+
+<h3 id="w4">4. The Integer cache trap (a favourite interview question)</h3>
+<p><code>Integer.valueOf</code> reuses cached objects for values from <strong>-128 to 127</strong>. Outside that range, each boxing creates a new object. So <code>==</code>, which compares object references, gives surprising answers.</p>
+<pre><span class="t">Integer</span> a = 100, b = 100;
+System.out.println(a == b);        <span class="c">// true  (same cached object)</span>
+
+<span class="t">Integer</span> c = 1000, d = 1000;
+System.out.println(c == d);        <span class="c">// false (two different objects)</span>
+System.out.println(c.equals(d));   <span class="c">// true  (compares values)</span></pre>
+<div class="note"><b>Rule</b><br>Compare wrapper objects with <code>.equals()</code>, never <code>==</code>. Use <code>==</code> only when at least one side is a primitive, because then the wrapper is unboxed first.</div>
+
+<div class="practice">
+<h3>Practice: Wrapper classes</h3>
+<ol>
+<li>What is the output?<pre><span class="t">Integer</span> p = 127, q = 127, r = 128, s = 128;
+System.out.println((p == q) + " " + (r == s));</pre>
+<details><summary>Answer</summary><code>true false</code>. 127 is inside the cache range; 128 is not, so <code>r</code> and <code>s</code> are different objects.</details></li>
+<li>Why does <code>List&lt;int&gt; list;</code> not compile, and what is the fix?
+<details><summary>Answer</summary>Generics accept only reference types. Use <code>List&lt;Integer&gt;</code>; autoboxing handles the conversion.</details></li>
+<li>What happens here?<pre><span class="t">Integer</span> n = <span class="k">null</span>;
+<span class="k">if</span> (n == 0) { }</pre>
+<details><summary>Answer</summary><code>NullPointerException</code>. <code>n</code> is unboxed to compare with the primitive <code>0</code>, and a null cannot be unboxed.</details></li>
+<li>Read a number from the string <code>"2024"</code> and print it plus 1.
+<details><summary>Answer</summary><code>int y = Integer.parseInt("2024"); System.out.println(y + 1);</code> prints 2025.</details></li>
+<li>Does <code>Integer x = 5; x++;</code> modify the original object?
+<details><summary>Answer</summary>No. Wrappers are immutable. <code>x++</code> unboxes, adds 1, boxes the result into a different object, and assigns it to <code>x</code>.</details></li>
+<li>Interview: what is the difference between <code>Integer.parseInt()</code> and <code>Integer.valueOf()</code>?
+<details><summary>Answer</summary><code>parseInt</code> returns a primitive <code>int</code>. <code>valueOf</code> returns an <code>Integer</code> object and uses the cache for small values.</details></li>
+</ol>
+</div>
+
+<h2>Quick summary</h2>
+<ul>
+<li>An interface defines <em>what</em> a class can do; implementing classes decide <em>how</em>. It gives polymorphism and multiple inheritance of type.</li>
+<li>Since Java 8, interfaces may have <code>default</code> and <code>static</code> methods; one abstract method makes it a functional interface usable with lambdas.</li>
+<li>Wrapper classes turn primitives into immutable objects so they work with collections, generics and <code>null</code>.</li>
+<li>Autoboxing is convenient, but watch for null unboxing, loop slowness and the <code>==</code> cache trap.</li>
+</ul>
+</div>
+</body>
+</html>
