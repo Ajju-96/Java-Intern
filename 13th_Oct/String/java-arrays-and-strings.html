@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Java: Arrays and Strings</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{--bg:#f6f7f9;--ink:#1d2433;--mute:#566074;--line:#d9dde5;--acc:#0e7c86;--accbg:#e3f3f4;--warn:#9a5b00;--warnbg:#fff3dc;--code:#0f1b2d;--codeink:#e6edf7;--card:#fff}
+@media(prefers-color-scheme:dark){:root{--bg:#10151f;--ink:#e6e9ef;--mute:#9aa4b6;--line:#2a3345;--acc:#4cc3cd;--accbg:#12303a;--warn:#f0b35a;--warnbg:#3a2c12;--code:#070d17;--card:#171e2c}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.65 Newsreader,Georgia,serif}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+h1{font-size:2.4rem;line-height:1.15;margin:.2em 0 .3em}
+h2{font-size:1.7rem;margin:2.2em 0 .5em;padding-top:.6em;border-top:2px solid var(--ink)}
+h3{font-size:1.25rem;margin:1.8em 0 .4em;color:var(--acc)}
+p,li{max-width:70ch}
+code,pre{font-family:"JetBrains Mono",Consolas,monospace;font-size:.82rem}
+:not(pre)>code{background:var(--accbg);padding:.1em .35em;border-radius:4px}
+pre{background:var(--code);color:var(--codeink);padding:14px 16px;border-radius:8px;overflow-x:auto;line-height:1.55;margin:1em 0}
+.k{color:#7cc4ff}.s{color:#a5e08a}.c{color:#7f8da6;font-style:italic}.t{color:#f2b872}
+nav{display:flex;flex-wrap:wrap;gap:6px 14px;margin:18px 0 8px;font:600 .9rem system-ui,sans-serif}
+nav a{color:var(--acc);text-decoration:none}nav a:hover,nav a:focus-visible{text-decoration:underline}
+.lead{color:var(--mute);font-size:1.1rem}
+.note,.warn{padding:12px 16px;border-radius:8px;margin:1.2em 0;border-left:4px solid var(--acc);background:var(--accbg)}
+.warn{border-color:var(--warn);background:var(--warnbg)}
+.note b,.warn b{font-family:system-ui,sans-serif;font-size:.9rem}
+table{border-collapse:collapse;width:100%;margin:1em 0;font:.92rem/1.45 system-ui,sans-serif;background:var(--card)}
+.tw{overflow-x:auto}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--accbg)}
+.practice{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 20px 14px;margin:1.8em 0}
+.practice h3{margin-top:.8em}
+details{margin:.5em 0}summary{cursor:pointer;color:var(--acc);font:600 .9rem system-ui,sans-serif}
+summary:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+li{margin:.3em 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Java: Arrays and Strings</h1>
+<p class="lead">A teaching guide for undergraduates preparing for placement interviews. Each part ends with practice questions; answers are hidden until you click them.</p>
+<nav>
+<a href="#a1">Array basics</a><a href="#a2">Access and loops</a><a href="#a3">2D and jagged</a><a href="#a4">Arrays are objects</a><a href="#a5">Arrays class</a><a href="#a6">Varargs, ArrayList</a><a href="#s1">String basics</a><a href="#s2">String pool</a><a href="#s3">Comparing</a><a href="#s4">Methods</a><a href="#s5">StringBuilder</a><a href="#s6">Conversions</a>
+</nav>
+
+<h2 id="part1">Part 1: Arrays</h2>
+
+<h3 id="a1">1. Array basics</h3>
+<p>An array is a fixed-size, ordered collection of elements of the <strong>same type</strong>, stored in contiguous memory and accessed by index starting at 0. The size is set when the array is created and can never change.</p>
+<pre>int[] marks;                          // declaration (preferred style)
+marks = new int[5];                   // creation: 5 slots, all 0
+int[] ages = {18, 19, 20};            // declaration + initialisation
+String[] names = new String[]{"Asha", "Ravi"};
+
+System.out.println(ages.length);      // 3  (a field, not a method: no parentheses)</pre>
+<p>Every slot gets a <strong>default value</strong> when you create an array with <code>new</code>:</p>
+<div class="tw"><table>
+<tr><th>Element type</th><th>Default</th></tr>
+<tr><td><code>byte</code>, <code>short</code>, <code>int</code>, <code>long</code></td><td><code>0</code></td></tr>
+<tr><td><code>float</code>, <code>double</code></td><td><code>0.0</code></td></tr>
+<tr><td><code>char</code></td><td><code>'\u0000'</code> (the null character)</td></tr>
+<tr><td><code>boolean</code></td><td><code>false</code></td></tr>
+<tr><td>any object, including <code>String</code></td><td><code>null</code></td></tr>
+</table></div>
+
+<h3 id="a2">2. Access, iteration and exceptions</h3>
+<pre>int[] a = {10, 20, 30, 40};
+
+for (int i = 0; i &lt; a.length; i++)   // index loop: use when you need the position
+    System.out.print(a[i] + " ");
+
+for (int x : a)                       // for-each: read-only view of each value
+    System.out.print(x + " ");
+
+a[4] = 50;     // ArrayIndexOutOfBoundsException (valid indexes: 0 to 3)
+int[] n = new int[-1];   // NegativeArraySizeException
+int[] z = null;
+z[0] = 1;      // NullPointerException</pre>
+<div class="warn"><b>Common bug</b><br>Writing <code>i &lt;= a.length</code> in a loop reads one slot past the end. The last valid index is always <code>length - 1</code>. Also, assigning to the for-each variable does not change the array.</div>
+<p>Classic example, finding the largest element:</p>
+<pre>int max = a[0];
+for (int i = 1; i &lt; a.length; i++)
+    if (a[i] &gt; max) max = a[i];</pre>
+
+<h3 id="a3">3. Two-dimensional and jagged arrays</h3>
+<p>Java has no true matrix type. A 2D array is an <strong>array of arrays</strong>, so each row can have a different length (a <em>jagged</em> array).</p>
+<pre>int[][] grid = new int[3][4];                 // 3 rows, 4 columns
+int[][] m = { {1, 2, 3}, {4, 5, 6} };
+System.out.println(m[1][2]);                  // 6
+System.out.println(m.length + " " + m[0].length);   // 2 3  (rows, columns)
+
+int[][] tri = new int[3][];                   // only rows allocated
+for (int i = 0; i &lt; 3; i++) tri[i] = new int[i + 1];   // lengths 1, 2, 3
+
+for (int[] row : m) {                         // print a matrix
+    for (int v : row) System.out.print(v + " ");
+    System.out.println();
+}</pre>
+
+<h3 id="a4">4. Arrays are objects: references, copying and comparing</h3>
+<p>An array variable holds a <strong>reference</strong> to the array object on the heap. Assigning it copies the reference, not the data.</p>
+<pre>int[] a = {1, 2, 3};
+int[] b = a;            // b points to the SAME array
+b[0] = 99;
+System.out.println(a[0]);          // 99
+
+int[] c = a.clone();               // new array, same values (shallow copy)
+int[] d = Arrays.copyOf(a, 5);     // new array of length 5: {99,2,3,0,0}
+
+System.out.println(a == c);                  // false: different objects
+System.out.println(a.equals(c));             // false: equals is NOT overridden for arrays
+System.out.println(Arrays.equals(a, c));     // true: compares contents
+
+static void change(int[] arr) { arr[0] = -1; }   // caller sees this change
+static void reassign(int[] arr) { arr = new int[]{7}; }   // caller does NOT see this</pre>
+<div class="note"><b>Interview point</b><br>Java is always pass-by-value. For arrays the value passed is the reference, so a method can modify the elements but cannot make the caller's variable point to a new array. Also note <code>clone()</code> on a 2D array copies only the outer array; the rows are shared.</div>
+
+<h3 id="a5">5. The <code>Arrays</code> utility class</h3>
+<pre>import java.util.Arrays;
+
+int[] a = {5, 2, 9, 1};
+Arrays.sort(a);                              // {1, 2, 5, 9}, in place
+int pos = Arrays.binarySearch(a, 5);         // 2 (array must be sorted first)
+Arrays.fill(a, 0);                           // {0, 0, 0, 0}
+System.out.println(Arrays.toString(a));      // "[0, 0, 0, 0]"  (a bare println(a) prints [I@1b6d3586)
+
+int[][] m = {{1, 2}, {3, 4}};
+System.out.println(Arrays.deepToString(m));  // "[[1, 2], [3, 4]]"
+
+int[] part = Arrays.copyOfRange(a, 1, 3);    // indexes 1 and 2
+Integer[] boxed = {3, 1, 2};
+Arrays.sort(boxed, Collections.reverseOrder());   // descending needs object arrays
+List&lt;Integer&gt; list = Arrays.asList(boxed);        // fixed-size list backed by the array</pre>
+<p><code>Arrays.sort</code> on primitives uses dual-pivot quicksort; on objects it uses a stable merge sort variant (TimSort).</p>
+
+<h3 id="a6">6. Varargs, and arrays vs ArrayList</h3>
+<p>Varargs let a method accept any number of arguments; inside, the parameter is an ordinary array. It must be the last parameter.</p>
+<pre>static int sum(int... nums) {          // sum(), sum(1), sum(1, 2, 3) all work
+    int total = 0;
+    for (int n : nums) total += n;
+    return total;
+}</pre>
+<div class="tw"><table>
+<tr><th>Point</th><th>Array</th><th>ArrayList</th></tr>
+<tr><td>Size</td><td>Fixed</td><td>Grows and shrinks</td></tr>
+<tr><td>Element types</td><td>Primitives or objects</td><td>Objects only (wrappers like <code>Integer</code>)</td></tr>
+<tr><td>Length</td><td><code>arr.length</code></td><td><code>list.size()</code></td></tr>
+<tr><td>Access</td><td><code>arr[i]</code></td><td><code>list.get(i)</code></td></tr>
+<tr><td>Speed and memory</td><td>Faster, compact</td><td>Slight overhead from boxing and resizing</td></tr>
+</table></div>
+
+<div class="practice">
+<h3>Practice: Arrays</h3>
+<ol>
+<li>What does this print?<pre>int[] a = new int[3];
+String[] s = new String[2];
+System.out.println(a[1] + " " + s[0]);</pre>
+<details><summary>Answer</summary><code>0 null</code>. Arrays are filled with default values: 0 for int, null for objects.</details></li>
+<li>What is wrong with <code>for (int i = 0; i &lt;= arr.length; i++) sum += arr[i];</code>?
+<details><summary>Answer</summary>On the last iteration <code>i == arr.length</code>, which throws <code>ArrayIndexOutOfBoundsException</code>. Use <code>i &lt; arr.length</code>.</details></li>
+<li>Write code to reverse an array in place.
+<details><summary>Answer</summary><pre>for (int i = 0, j = a.length - 1; i &lt; j; i++, j--) {
+    int tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+}</pre></details></li>
+<li>Why does <code>System.out.println(new int[]{1,2})</code> print something like <code>[I@15db9742</code>?
+<details><summary>Answer</summary>Arrays do not override <code>toString()</code>, so you get the type code, <code>@</code> and a hash. Use <code>Arrays.toString(arr)</code>.</details></li>
+<li>Given <code>int[] a = {1,2,3}; int[] b = a; b[0] = 9;</code>, what is <code>a[0]</code>? How do you get an independent copy?
+<details><summary>Answer</summary>9, because both variables refer to one array. Use <code>a.clone()</code> or <code>Arrays.copyOf(a, a.length)</code>.</details></li>
+<li>Interview: find the second largest element in one pass.
+<details><summary>Answer</summary><pre>int first = Integer.MIN_VALUE, second = Integer.MIN_VALUE;
+for (int x : a) {
+    if (x &gt; first) { second = first; first = x; }
+    else if (x &gt; second &amp;&amp; x != first) second = x;
+}</pre>Time O(n), extra space O(1).</details></li>
+</ol>
+</div>
+
+<h2 id="part2">Part 2: Strings</h2>
+
+<h3 id="s1">1. String basics</h3>
+<p>A <code>String</code> is an object that holds a sequence of characters (stored as UTF-16 code units). It is a class, not a primitive, and the most-used class in Java. Strings are <strong>immutable</strong>: no method changes an existing string; each one returns a new string.</p>
+<pre>String a = "hello";                    // literal
+String b = new String("hello");        // explicit object
+char[] chars = {'h', 'i'};
+String c = new String(chars);          // from a char array
+
+String s = "java";
+s.toUpperCase();                       // returns "JAVA" but s is unchanged
+s = s.toUpperCase();                   // reassign to keep the result
+s.concat(" rocks");                    // result thrown away unless assigned</pre>
+<p>Why immutable? It makes strings safe to share between threads, safe as <code>HashMap</code> keys (the hash never changes), and safe for security-sensitive values like file paths. It also allows the string pool.</p>
+
+<h3 id="s2">2. The string constant pool</h3>
+<p>Literals are stored in a special area called the <strong>string pool</strong>. If the same literal appears twice, Java reuses one object. <code>new String(...)</code> always creates a separate object on the heap.</p>
+<pre>String a = "hello";
+String b = "hello";
+String c = new String("hello");
+
+System.out.println(a == b);            // true  (same pooled object)
+System.out.println(a == c);            // false (c is a different object)
+System.out.println(a.equals(c));       // true  (same characters)
+System.out.println(a == c.intern());   // true  (intern() returns the pooled copy)
+
+String x = "hel" + "lo";               // compile-time constant, so pooled
+String y = "hel";
+String z = y + "lo";                   // computed at runtime, so a new object
+System.out.println(a == x);            // true
+System.out.println(a == z);            // false</pre>
+<p><code>new String("hello")</code> creates one heap object (plus the pooled literal if it was not already there), so it is wasteful. Prefer plain literals.</p>
+
+<h3 id="s3">3. Comparing strings</h3>
+<div class="tw"><table>
+<tr><th>Method</th><th>What it does</th></tr>
+<tr><td><code>==</code></td><td>Compares references (same object?). Almost never what you want for strings.</td></tr>
+<tr><td><code>equals(s)</code></td><td>Compares the characters, case-sensitive.</td></tr>
+<tr><td><code>equalsIgnoreCase(s)</code></td><td>Compares characters ignoring case.</td></tr>
+<tr><td><code>compareTo(s)</code></td><td>Dictionary order. Returns negative, 0 or positive (difference of the first differing characters, or of the lengths).</td></tr>
+</table></div>
+<pre>"apple".compareTo("banana");     // negative ('a' - 'b' = -1)
+"b".compareTo("a");              // 1
+"abc".compareTo("abcde");        // -2  (length difference)
+"Java".equalsIgnoreCase("JAVA"); // true
+
+String input = null;
+"admin".equals(input);           // false, safe
+input.equals("admin");           // NullPointerException: put the literal on the left</pre>
+
+<h3 id="s4">4. Important String methods</h3>
+<pre>String s = "  Hello, World  ";
+
+s.length();                         // 16
+s.trim();                           // "Hello, World"  (strip() also handles Unicode spaces)
+String t = s.trim();
+t.charAt(0);                        // 'H'   (index must be 0 to length-1, else StringIndexOutOfBoundsException)
+t.indexOf('o');                     // 4
+t.lastIndexOf("o");                 // 8
+t.indexOf("xyz");                   // -1  (not found)
+t.substring(7);                     // "World"
+t.substring(0, 5);                  // "Hello"  (end index is exclusive)
+t.contains("World");                // true
+t.startsWith("He");                 // true
+t.endsWith("d");                    // true
+t.replace('l', 'L');                // "HeLLo, WorLd"
+t.replace("World", "Java");         // "Hello, Java"
+t.toLowerCase();                    // "hello, world"
+t.isEmpty();                        // false (length == 0)
+"   ".isBlank();                    // true  (Java 11+)
+"ab".repeat(3);                     // "ababab" (Java 11+)
+
+String[] parts = "a,b,,c".split(",");        // ["a", "b", "", "c"]
+String joined = String.join("-", "x", "y");  // "x-y"
+char[] arr = t.toCharArray();                // to modify characters, then new String(arr)</pre>
+<div class="warn"><b>Common bug</b><br><code>split</code> takes a <em>regular expression</em>. To split on a dot or pipe, escape it: <code>s.split("\\.")</code> and <code>s.split("\\|")</code>. Trailing empty strings are dropped.</div>
+
+<h3 id="s5">5. StringBuilder and StringBuffer</h3>
+<p>Because each <code>+</code> on strings makes a new object, building a string in a loop is slow. <code>StringBuilder</code> is a mutable character buffer that changes in place.</p>
+<pre>StringBuilder sb = new StringBuilder();
+for (int i = 0; i &lt; 5; i++) sb.append(i).append(',');   // fast: one buffer
+sb.append("end");
+sb.insert(0, "[");            // [0,1,2,3,4,end
+sb.reverse();
+sb.setCharAt(0, 'X');
+sb.deleteCharAt(sb.length() - 1);
+String result = sb.toString();   // convert back when finished
+
+String bad = "";
+for (int i = 0; i &lt; 10000; i++) bad += i;   // creates thousands of temporary strings</pre>
+<div class="tw"><table>
+<tr><th></th><th>String</th><th>StringBuilder</th><th>StringBuffer</th></tr>
+<tr><td>Mutable</td><td>No</td><td>Yes</td><td>Yes</td></tr>
+<tr><td>Thread-safe</td><td>Yes (immutable)</td><td>No</td><td>Yes (synchronized)</td></tr>
+<tr><td>Speed for edits</td><td>Slow</td><td>Fastest</td><td>Slower than StringBuilder</td></tr>
+<tr><td><code>equals()</code></td><td>Compares content</td><td colspan="2">Not overridden: compares references</td></tr>
+</table></div>
+<p>Rule of thumb: use <code>String</code> for fixed text, <code>StringBuilder</code> for building text in loops, and <code>StringBuffer</code> only when several threads share one buffer.</p>
+
+<h3 id="s6">6. Conversions, formatting and text blocks</h3>
+<pre>int n = Integer.parseInt("42");          // String to int
+String s1 = String.valueOf(42);          // int to String
+String s2 = 42 + "";                     // also works, less clear
+double d = Double.parseDouble("3.5");
+
+String f = String.format("%s scored %d (%.2f%%)", "Asha", 87, 87.456);
+// "Asha scored 87 (87.46%)"   %s string, %d integer, %f decimal, %n newline
+
+String block = """
+    Roll: 101
+    Name: Asha
+    """;                                 // text block (Java 15+), keeps line breaks
+
+// Palindrome check
+static boolean isPalindrome(String s) {
+    return new StringBuilder(s).reverse().toString().equals(s);
+}
+
+// Count characters
+int[] freq = new int[26];
+for (char ch : "hello".toCharArray()) freq[ch - 'a']++;   // freq['l' - 'a'] == 2</pre>
+<p>Strings also work in <code>switch</code> (compared with <code>equals</code>), and <code>chars</code> can be used in arithmetic: <code>'a' + 1</code> is the <code>int</code> 98, while <code>(char)('a' + 1)</code> is <code>'b'</code>.</p>
+
+<div class="practice">
+<h3>Practice: Strings</h3>
+<ol>
+<li>What is printed?<pre>String a = "Java", b = "Java", c = new String("Java");
+System.out.println((a == b) + " " + (a == c) + " " + a.equals(c));</pre>
+<details><summary>Answer</summary><code>true false true</code>. Literals share one pooled object; <code>new</code> makes a separate object; <code>equals</code> compares content.</details></li>
+<li>What does this print?<pre>String s = "hello";
+s.toUpperCase();
+s.concat(" world");
+System.out.println(s);</pre>
+<details><summary>Answer</summary><code>hello</code>. Strings are immutable and the returned values were discarded.</details></li>
+<li>What is <code>"Programming".substring(3, 7)</code>?
+<details><summary>Answer</summary><code>"gram"</code>: characters at indexes 3, 4, 5, 6 (end is exclusive).</details></li>
+<li>How many objects does <code>String s = new String("abc");</code> create, at most?
+<details><summary>Answer</summary>Two: the pooled literal <code>"abc"</code> (if not already there) and the heap object created by <code>new</code>.</details></li>
+<li>Write a method to count vowels in a string.
+<details><summary>Answer</summary><pre>static int vowels(String s) {
+    int n = 0;
+    for (char c : s.toLowerCase().toCharArray())
+        if ("aeiou".indexOf(c) != -1) n++;
+    return n;
+}</pre></details></li>
+<li>Check whether two strings are anagrams.
+<details><summary>Answer</summary><pre>static boolean anagram(String a, String b) {
+    char[] x = a.toCharArray(), y = b.toCharArray();
+    Arrays.sort(x); Arrays.sort(y);
+    return Arrays.equals(x, y);
+}</pre>Sorting costs O(n log n); a 26-slot frequency array does it in O(n).</details></li>
+<li>Interview: why is <code>String</code> immutable, and when would you use <code>StringBuilder</code>?
+<details><summary>Answer</summary>Immutability gives thread safety, stable hash codes for map keys, security, and enables the string pool. Use <code>StringBuilder</code> when you modify or append repeatedly, especially in loops, to avoid creating many temporary strings.</details></li>
+</ol>
+</div>
+
+<h2>Quick summary</h2>
+<ul>
+<li>Arrays are fixed-size, zero-indexed and hold one type. They are objects, so variables hold references; use <code>Arrays.toString</code>, <code>Arrays.equals</code> and <code>clone</code>/<code>copyOf</code> for printing, comparing and copying.</li>
+<li>2D arrays are arrays of arrays and can be jagged. <code>length</code> is a field for arrays and a method for strings.</li>
+<li>Strings are immutable. Compare content with <code>equals</code>, never <code>==</code>; literals live in the string pool.</li>
+<li>Use <code>StringBuilder</code> to build strings in loops; remember that <code>split</code> takes a regex.</li>
+</ul>
+</div>
+<script>
+(function(){
+var kw="abstract|boolean|break|case|char|class|double|else|final|float|for|if|import|int|interface|long|new|null|return|static|switch|this|true|false|void|while|byte|short|var";
+var re=new RegExp('(\\/\\/.*$)|("""[\\s\\S]*?"""|"(?:[^"\\\\\\n]|\\\\.)*"|\'(?:[^\'\\\\\\n]|\\\\.)*\')|\\b('+kw+')\\b|\\b([A-Z][A-Za-z0-9_]*)\\b','gm');
+document.querySelectorAll('pre').forEach(function(p){
+var t=p.textContent.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+p.innerHTML=t.replace(re,function(m,c,s,k,u){
+return '<span class="'+(c?'c':s?'s':k?'k':'t')+'">'+m+'</span>';});
+});
+})();
+</script>
+</body>
+</html>
