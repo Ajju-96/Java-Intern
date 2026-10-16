@@ -12,5 +12,8 @@ public class Example3 {
         Function<String, Integer> getLength = name -> name.length();
         System.out.println(getLength.apply("Java"));
         System.out.println(getLength.apply("john"));
+
+//        Function<Interger, Interger> square = n -> n * n;
+//        System.out.println(square.apply(5));
     }
 }
