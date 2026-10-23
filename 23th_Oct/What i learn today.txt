@@ -1,0 +1,15 @@
+What is JDBC: Java Database Connectivity
+-JDBC a standard Java API that lets Java applications connect to and run SQL queries on relational databases.
+
+Steps: 
+1. Import Packages
+2. Load Driver
+3. Register Driver
+4. Create Connection
+5. Create Statement
+6. Execute Statement
+7. Close
+
+Post Number for MySQL : 3306
+
+
