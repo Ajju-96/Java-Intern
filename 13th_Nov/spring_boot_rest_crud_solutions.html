@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spring Boot REST CRUD: Solutions Guide</title>
+<style>
+:root{
+  --bg:#f6f7f9; --surface:#ffffff; --ink:#1b2333; --muted:#5b6578; --line:#dfe3ea;
+  --code-bg:#10192b; --code-ink:#e6ebf5; --code-dim:#8f9bb3;
+  --cfg:#2f6fdb; --ent:#c07a00; --repo:#7a4fd1; --ctl:#14804a; --res:#b03a6a; --dto:#0e7f8c;
+  --note-bg:#eaf2ff; --note-line:#9bbcf2; --warn-bg:#fff4dc; --warn-line:#e6bd6a;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0d1320; --surface:#151d2e; --ink:#e8edf6; --muted:#9aa6bd; --line:#26314a;
+    --code-bg:#0a0f1a; --code-ink:#e6ebf5; --code-dim:#7f8ba3;
+    --cfg:#6ea3ff; --ent:#f0b44a; --repo:#a98cf0; --ctl:#4fcf8d; --res:#ef7fab; --dto:#4fd0de;
+    --note-bg:#14243f; --note-line:#2f4c80; --warn-bg:#3a2d10; --warn-line:#8a6a1f;
+  }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"IBM Plex Sans","Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;
+  line-height:1.65;font-size:17px}
+.wrap{max-width:860px;margin:0 auto;padding:40px 22px 90px}
+h1{font-size:2.1rem;line-height:1.2;margin:0 0 10px}
+h2{font-size:1.6rem;margin:0 0 6px;line-height:1.25}
+h3{font-size:1.2rem;margin:34px 0 8px}
+h4{font-size:1.02rem;margin:22px 0 6px}
+p{margin:10px 0;max-width:72ch}
+.sub{color:var(--muted);margin:0 0 26px;max-width:62ch}
+code{font-family:"JetBrains Mono","IBM Plex Mono",Consolas,Menlo,monospace;font-size:.88em;
+  background:rgba(120,130,160,.16);padding:1px 6px;border-radius:4px}
+pre code{background:none;padding:0;font-size:inherit}
+a{color:var(--cfg)}
+nav.toc{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 22px;margin:0 0 40px}
+nav.toc ul{margin:6px 0 0;padding-left:20px}
+nav.toc li{margin:4px 0}
+section.q{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:30px 28px 22px;margin:0 0 36px}
+.phase{display:flex;gap:10px;align-items:baseline;margin:38px 0 4px;padding-top:18px;border-top:2px solid var(--line)}
+.phase:first-of-type{border-top:none;margin-top:18px}
+.phase b{font-size:1.25rem}
+.phase span{color:var(--muted);font-size:.95rem}
+.file{display:flex;align-items:center;gap:10px;margin:22px 0 0;background:var(--code-bg);
+  border-radius:8px 8px 0 0;padding:8px 14px;border-top:4px solid var(--tab,var(--cfg))}
+.file .path{font-family:"JetBrains Mono",Consolas,Menlo,monospace;font-size:.84rem;color:var(--code-ink);overflow-wrap:anywhere}
+.file .tag{margin-left:auto;font-size:.78rem;color:var(--tab,var(--cfg));white-space:nowrap}
+.file button{background:transparent;border:1px solid var(--code-dim);color:var(--code-ink);border-radius:5px;
+  font-size:.75rem;padding:2px 9px;cursor:pointer}
+.file button:hover,.file button:focus-visible{background:rgba(255,255,255,.12);outline:2px solid var(--tab,var(--cfg))}
+pre{margin:0 0 20px;background:var(--code-bg);color:var(--code-ink);padding:16px 18px;border-radius:0 0 8px 8px;
+  overflow-x:auto;font-family:"JetBrains Mono","IBM Plex Mono",Consolas,Menlo,monospace;font-size:.84rem;line-height:1.55;tab-size:4}
+.c{color:var(--code-dim)}
+.hl{background:rgba(255,220,120,.16);display:inline-block;width:100%}
+.t-cfg{--tab:var(--cfg)} .t-ent{--tab:var(--ent)} .t-repo{--tab:var(--repo)}
+.t-ctl{--tab:var(--ctl)} .t-res{--tab:var(--res)} .t-dto{--tab:var(--dto)}
+.note,.warn{border-left:4px solid var(--note-line);background:var(--note-bg);padding:10px 16px;border-radius:0 8px 8px 0;margin:18px 0}
+.warn{border-color:var(--warn-line);background:var(--warn-bg)}
+.note p,.warn p{margin:4px 0}
+table{border-collapse:collapse;width:100%;margin:14px 0;font-size:.95rem}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:rgba(120,130,160,.12)}
+.tablewrap{overflow-x:auto}
+.tree{font-family:"JetBrains Mono",Consolas,Menlo,monospace;font-size:.84rem;background:var(--code-bg);color:var(--code-ink);
+  padding:14px 18px;border-radius:8px;overflow-x:auto;white-space:pre;line-height:1.5;margin:14px 0}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:.88rem;margin:10px 0 0}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+ol.steps{padding-left:22px} ol.steps li{margin:8px 0}
+@media (max-width:600px){ body{font-size:16px} section.q{padding:22px 16px} h1{font-size:1.7rem} }
+@media print{ body{background:#fff} nav.toc{display:none} .file button{display:none} section.q{break-inside:auto;border:none;padding:0} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Spring Boot REST CRUD: Solutions Guide</h1>
+<p class="sub">Three practice questions, each explained in the same order: what the question asks, what starter (boilerplate) code you receive, and the complete solution, shown file by file.</p>
+
+<nav class="toc" aria-label="Contents">
+  <strong>Contents</strong>
+  <ul>
+    <li><a href="#basics">Before you start: REST and Spring Boot cheat sheet</a></li>
+    <li><a href="#q1">Question 1: Bean configuration with XML, Java and annotations</a></li>
+    <li><a href="#q2">Question 2: Weather REST API (POST, GET, GET by id, DELETE)</a></li>
+    <li><a href="#q3">Question 3: Customer and Coach REST API</a></li>
+    <li><a href="#pitfalls">Common mistakes and how to test</a></li>
+  </ul>
+</nav>
+
+<section class="q" id="basics">
+<h2>Before you start</h2>
+<p>The starter projects are not identical on every machine, so this guide makes two assumptions. Adjust them if your project differs.</p>
+<ul>
+  <li><strong>Package names.</strong> This guide uses <code>com.example.notification</code> (Q1), <code>com.example.weather</code> (Q2) and <code>com.example.fitness</code> (Q3). Keep the <code>package</code> line your starter project already has, and keep every new class in the same base package or a sub-package of it, so Spring can find it.</li>
+  <li><strong>Spring Boot version.</strong> The code uses <code>jakarta.persistence.*</code> (Spring Boot 3). If your project uses Spring Boot 2, change those imports to <code>javax.persistence.*</code>. Nothing else changes.</li>
+</ul>
+
+<h3>How a REST request travels</h3>
+<div class="tree">Client (Postman / test)  ──HTTP──&gt;  Controller  ──&gt;  Repository  ──&gt;  Database (H2)
+                        &lt;──JSON──      (decides status)    (saves / finds)      (stores rows)</div>
+<ul>
+  <li><strong>Entity</strong>: a Java class that maps to a database table. One object = one row.</li>
+  <li><strong>Repository</strong>: an interface Spring turns into a working class that can save, find and delete entities. You write no SQL.</li>
+  <li><strong>Controller</strong>: receives HTTP requests, calls the repository and returns the HTTP status and JSON body.</li>
+</ul>
+
+<h3>Annotations used in this guide</h3>
+<div class="tablewrap"><table>
+<tr><th>Annotation</th><th>Meaning</th></tr>
+<tr><td><code>@RestController</code></td><td>This class handles web requests and returns JSON.</td></tr>
+<tr><td><code>@RequestMapping("/weather")</code></td><td>Every method in this class lives under the URL <code>/weather</code>.</td></tr>
+<tr><td><code>@PostMapping / @GetMapping / @DeleteMapping</code></td><td>The method answers a POST / GET / DELETE request.</td></tr>
+<tr><td><code>@PathVariable</code></td><td>Reads a value from the URL, e.g. the <code>5</code> in <code>/weather/5</code>.</td></tr>
+<tr><td><code>@RequestBody</code></td><td>Converts the JSON sent by the client into a Java object.</td></tr>
+<tr><td><code>@Entity, @Id, @GeneratedValue</code></td><td>Marks a table class, its primary key, and tells the database to generate the id.</td></tr>
+<tr><td><code>@Configuration, @Bean</code></td><td>A class that creates objects (beans) for Spring, and the methods that create them.</td></tr>
+</table></div>
+
+<h3>HTTP status codes you must return</h3>
+<div class="tablewrap"><table>
+<tr><th>Code</th><th>Name</th><th>Used when</th></tr>
+<tr><td>200</td><td>OK</td><td>A GET succeeded.</td></tr>
+<tr><td>201</td><td>Created</td><td>A POST created a new record.</td></tr>
+<tr><td>204</td><td>No Content</td><td>A DELETE succeeded; nothing to send back.</td></tr>
+<tr><td>400</td><td>Bad Request</td><td>The request refers to something invalid (used in Q3 for an unknown <code>coach_id</code>).</td></tr>
+<tr><td>404</td><td>Not Found</td><td>The record with that id does not exist.</td></tr>
+</table></div>
+
+<h3>Colour legend for the file tabs</h3>
+<p>Every code block starts with a tab showing the exact file to edit. The tab colour tells you what kind of file it is.</p>
+<div class="legend">
+  <span><i style="background:var(--cfg)"></i>Configuration / main class</span>
+  <span><i style="background:var(--ent)"></i>Entity</span>
+  <span><i style="background:var(--repo)"></i>Repository</span>
+  <span><i style="background:var(--dto)"></i>DTO (request object)</span>
+  <span><i style="background:var(--ctl)"></i>Controller</span>
+  <span><i style="background:var(--res)"></i>Resource / properties</span>
+</div>
+</section>
+
+<!-- ============================ Q1 ============================ -->
+<section class="q" id="q1">
+<h2>Question 1: Bean configuration with XML, Java and annotations</h2>
+<p class="sub">Topic: Spring Application Context and beans</p>
+
+<div class="phase"><b>Part 1. Understand the question</b></div>
+<p>A <strong>bean</strong> is simply an object that Spring creates and manages for you. All beans live in the <strong>Application Context</strong>, which is Spring's container. Other classes can then ask the container for a bean instead of creating it with <code>new</code>.</p>
+<p>Spring lets you tell the container about beans in three different ways. This question asks you to use all three, one for each group of classes:</p>
+<div class="tablewrap"><table>
+<tr><th>SN</th><th>Bean name</th><th>Class</th><th>Constructor argument</th><th>Configure using</th></tr>
+<tr><td>1</td><td><code>smsNotificationService</code></td><td>SmsNotificationService</td><td><code>"SMS_SERVICE"</code></td><td><strong>Java</strong></td></tr>
+<tr><td>2</td><td><code>callNotificationService</code></td><td>CallNotificationService</td><td><code>"CALL_SERVICE"</code></td><td><strong>Java</strong></td></tr>
+<tr><td>3</td><td><code>emailNotificationService</code></td><td>EmailNotificationService</td><td><code>"EMAIL_SERVICE"</code></td><td><strong>Annotation</strong></td></tr>
+<tr><td>4</td><td><code>thirdPartyNotificationService</code></td><td>ThirdPartyNotificationService</td><td><code>"THIRD_PARTY_SERVICE"</code></td><td><strong>XML</strong></td></tr>
+</table></div>
+<p><strong>What the three styles mean</strong></p>
+<ul>
+  <li><strong>Java-based:</strong> write a class marked <code>@Configuration</code> with methods marked <code>@Bean</code>. Each method creates and returns one object.</li>
+  <li><strong>XML-based:</strong> describe beans in an XML file using <code>&lt;bean&gt;</code> tags. A Java class then imports that file with <code>@ImportResource</code>.</li>
+  <li><strong>Annotation-based:</strong> mark the bean directly in code using annotations. Here we do it in <code>App.java</code>, which is already a configuration class because of <code>@SpringBootApplication</code>.</li>
+</ul>
+<p>The unit tests ask the context for each bean by <strong>name</strong>, so the names in the table must match exactly, including capital letters.</p>
+
+<div class="phase"><b>Part 2. The boilerplate</b></div>
+<p>The starter project has the four service classes already written, and the four configuration files exist but are empty.</p>
+<div class="tree">src/main/java/com/example/notification/
+  App.java                          &lt;- main class (you edit)
+  JavaBasedConfiguration.java       &lt;- empty (you edit)
+  XmlBasedConfiguration.java        &lt;- empty (you edit)
+  SmsNotificationService.java       &lt;- given
+  CallNotificationService.java      &lt;- given
+  EmailNotificationService.java     &lt;- given
+  ThirdPartyNotificationService.java&lt;- given
+src/main/resources/
+  xml_based_bean_configuration.xml  &lt;- empty &lt;beans&gt; (you edit)
+src/test/java/...                   &lt;- unit tests (do not edit)</div>
+
+<p>Each service class looks like this. It takes one <code>String</code> in its constructor. That is why every bean needs a constructor argument.</p>
+<div class="file t-cfg"><span class="path">SmsNotificationService.java (given; the other three look the same)</span><span class="tag">do not edit</span></div>
+<pre><code>package com.example.notification;
+
+public class SmsNotificationService {
+
+    private final String serviceName;
+
+    public SmsNotificationService(String serviceName) {
+        this.serviceName = serviceName;
+    }
+
+    public String getServiceName() {
+        return serviceName;
+    }
+}</code></pre>
+
+<p>The three configuration files you start with:</p>
+<div class="file t-cfg"><span class="path">src/main/java/com/example/notification/JavaBasedConfiguration.java</span><span class="tag">starter</span></div>
+<pre><code>package com.example.notification;
+
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class JavaBasedConfiguration {
+    // TODO: define beans #1 and #2 here
+}</code></pre>
+
+<div class="file t-cfg"><span class="path">src/main/java/com/example/notification/XmlBasedConfiguration.java</span><span class="tag">starter</span></div>
+<pre><code>package com.example.notification;
+
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class XmlBasedConfiguration {
+    // TODO: import xml_based_bean_configuration.xml here
+}</code></pre>
+
+<div class="file t-res"><span class="path">src/main/resources/xml_based_bean_configuration.xml</span><span class="tag">starter</span></div>
+<pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd"&gt;
+
+    &lt;!-- TODO: define bean #4 here --&gt;
+
+&lt;/beans&gt;</code></pre>
+
+<div class="file t-cfg"><span class="path">src/main/java/com/example/notification/App.java</span><span class="tag">starter</span></div>
+<pre><code>package com.example.notification;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class App {
+
+    public static void main(String[] args) {
+        SpringApplication.run(App.class, args);
+    }
+    // TODO: define bean #3 here
+}</code></pre>
+
+<div class="phase"><b>Part 3. The solution</b></div>
+<p>Four files change. Work through them in order.</p>
+
+<h4>Step 1. Beans #1 and #2: Java-based configuration</h4>
+<p>Each <code>@Bean</code> method builds one object. The bean name is set with <code>name = "..."</code>, which is what the tests look up.</p>
+<div class="file t-cfg"><span class="path">src/main/java/com/example/notification/JavaBasedConfiguration.java</span><span class="tag">edit this file</span></div>
+<pre><code>package com.example.notification;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class JavaBasedConfiguration {
+
+    @Bean(name = "smsNotificationService")
+    public SmsNotificationService smsNotificationService() {
+        return new SmsNotificationService("SMS_SERVICE");
+    }
+
+    @Bean(name = "callNotificationService")
+    public CallNotificationService callNotificationService() {
+        return new CallNotificationService("CALL_SERVICE");
+    }
+}</code></pre>
+
+<h4>Step 2. Bean #4: XML-based configuration (two files)</h4>
+<p>First describe the bean in the XML file. <code>id</code> is the bean name, <code>class</code> is the full class name including the package, and <code>constructor-arg</code> supplies the constructor value.</p>
+<div class="file t-res"><span class="path">src/main/resources/xml_based_bean_configuration.xml</span><span class="tag">edit this file</span></div>
+<pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd"&gt;
+
+<span class="hl">    &lt;bean id="thirdPartyNotificationService"
+          class="com.example.notification.ThirdPartyNotificationService"&gt;
+        &lt;constructor-arg value="THIRD_PARTY_SERVICE"/&gt;
+    &lt;/bean&gt;</span>
+
+&lt;/beans&gt;</code></pre>
+
+<p>Then tell Spring to read that XML file. <code>classpath:</code> means "look inside <code>src/main/resources</code>".</p>
+<div class="file t-cfg"><span class="path">src/main/java/com/example/notification/XmlBasedConfiguration.java</span><span class="tag">edit this file</span></div>
+<pre><code>package com.example.notification;
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.ImportResource;
+
+@Configuration
+@ImportResource("classpath:xml_based_bean_configuration.xml")
+public class XmlBasedConfiguration {
+}</code></pre>
+
+<h4>Step 3. Bean #3: annotation-based configuration in App.java</h4>
+<p><code>@SpringBootApplication</code> already includes <code>@Configuration</code>, so a <code>@Bean</code> method can live directly in <code>App.java</code>.</p>
+<div class="file t-cfg"><span class="path">src/main/java/com/example/notification/App.java</span><span class="tag">edit this file</span></div>
+<pre><code>package com.example.notification;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+
+@SpringBootApplication
+public class App {
+
+    public static void main(String[] args) {
+        SpringApplication.run(App.class, args);
+    }
+
+<span class="hl">    @Bean(name = "emailNotificationService")
+    public EmailNotificationService emailNotificationService() {
+        return new EmailNotificationService("EMAIL_SERVICE");
+    }</span>
+}</code></pre>
+
+<div class="note">
+<p><strong>Another valid way to do bean #3.</strong> You can annotate the service class itself, so no <code>@Bean</code> method is needed in <code>App.java</code>:</p>
+</div>
+<div class="file t-cfg"><span class="path">EmailNotificationService.java (alternative)</span><span class="tag">use this OR the @Bean method above</span></div>
+<pre><code>package com.example.notification;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+@Component("emailNotificationService")
+public class EmailNotificationService {
+
+    private final String serviceName;
+
+    public EmailNotificationService(@Value("EMAIL_SERVICE") String serviceName) {
+        this.serviceName = serviceName;
+    }
+
+    public String getServiceName() {
+        return serviceName;
+    }
+}</code></pre>
+<div class="warn"><p>Use only <strong>one</strong> of the two approaches. If both exist, Spring sees two beans with the same name and the application fails to start.</p></div>
+
+<h4>How the pieces fit together</h4>
+<ol class="steps">
+  <li>Spring Boot starts from <code>App</code> and scans its package, finding <code>JavaBasedConfiguration</code> and <code>XmlBasedConfiguration</code> because both are marked <code>@Configuration</code>.</li>
+  <li><code>JavaBasedConfiguration</code> registers beans #1 and #2 by running its <code>@Bean</code> methods.</li>
+  <li><code>XmlBasedConfiguration</code> loads the XML file, which registers bean #4.</li>
+  <li><code>App</code> registers bean #3 through its own <code>@Bean</code> method.</li>
+</ol>
+<p>A quick way to check: in a test, <code>context.getBean("thirdPartyNotificationService", ThirdPartyNotificationService.class).getServiceName()</code> should return <code>"THIRD_PARTY_SERVICE"</code>. Run all tests with <code>mvn test</code>.</p>
+</section>
+
+<!-- ============================ Q2 ============================ -->
+<section class="q" id="q2">
+<h2>Question 2: Weather REST API</h2>
+<p class="sub">Topic: full CRUD with Spring Web and Spring Data JPA on an H2 database</p>
+
+<div class="phase"><b>Part 1. Understand the question</b></div>
+<p>A travel company needs a service that stores daily temperature readings. Each reading is one JSON object:</p>
+<div class="file t-res"><span class="path">Example weather JSON</span><span class="tag">data format</span></div>
+<pre><code>{
+  "id": 1,
+  "date": "1985-01-01",
+  "lat": 36.1189,
+  "lon": -86.6892,
+  "city": "Nashville",
+  "state": "Tennessee",
+  "temperature": 17.3
+}</code></pre>
+<p>You must build the endpoint <code>/weather</code> with four operations:</p>
+<div class="tablewrap"><table>
+<tr><th>Request</th><th>What it does</th><th>Success response</th><th>Failure response</th></tr>
+<tr><td><code>POST /weather</code></td><td>Saves a new record. The body has no <code>id</code>; the database assigns one.</td><td>201 + the saved record including its <code>id</code></td><td>(input is always valid)</td></tr>
+<tr><td><code>GET /weather</code></td><td>Returns all records, ordered by id from smallest to largest.</td><td>200 + array of records</td><td></td></tr>
+<tr><td><code>GET /weather/{id}</code></td><td>Returns one record.</td><td>200 + the record</td><td>404 if the id does not exist</td></tr>
+<tr><td><code>DELETE /weather/{id}</code></td><td>Removes one record.</td><td>204, empty body</td><td>404 if the id does not exist</td></tr>
+</table></div>
+<p>Build <code>POST</code> first. The tests for the other methods create their data by calling <code>POST</code>, so nothing else can pass until it works.</p>
+<p><strong>Files to create or edit:</strong> the entity (<code>Weather</code>), the repository (<code>WeatherRepository</code>) and the controller (<code>WeatherController</code>).</p>
+
+<div class="phase"><b>Part 2. The boilerplate</b></div>
+<div class="tree">src/main/java/com/example/weather/
+  WeatherApplication.java     &lt;- main class (given, do not edit)
+  Weather.java                &lt;- empty class (you complete it)
+  WeatherRepository.java      &lt;- missing / empty (you create it)
+  WeatherController.java      &lt;- missing / empty (you create it)
+src/main/resources/
+  application.properties      &lt;- H2 settings (given)
+src/test/java/...             &lt;- unit tests (do not edit)</div>
+
+<div class="file t-cfg"><span class="path">src/main/java/com/example/weather/WeatherApplication.java</span><span class="tag">given</span></div>
+<pre><code>package com.example.weather;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class WeatherApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(WeatherApplication.class, args);
+    }
+}</code></pre>
+
+<div class="file t-res"><span class="path">src/main/resources/application.properties</span><span class="tag">given</span></div>
+<pre><code>spring.datasource.url=jdbc:h2:mem:weatherdb
+spring.datasource.driverClassName=org.h2.Driver
+spring.jpa.hibernate.ddl-auto=update
+spring.h2.console.enabled=true</code></pre>
+<p><code>ddl-auto=update</code> makes Hibernate create the <code>weather</code> table automatically from your entity class, so you never write SQL.</p>
+
+<div class="file t-ent"><span class="path">src/main/java/com/example/weather/Weather.java</span><span class="tag">starter</span></div>
+<pre><code>package com.example.weather;
+
+public class Weather {
+    // TODO: add fields, annotations, getters and setters
+}</code></pre>
+
+<div class="phase"><b>Part 3. The solution</b></div>
+
+<h4>Step 1. Entity: Weather.java</h4>
+<p>The entity has one field for every JSON property. Field names must match the JSON names exactly (<code>lat</code>, <code>lon</code>, <code>city</code>, ...), otherwise Spring cannot convert between JSON and Java. <code>@GeneratedValue</code> makes the database assign the next id automatically. <code>LocalDate</code> is converted to and from <code>"YYYY-MM-DD"</code> by Spring Boot.</p>
+<div class="file t-ent"><span class="path">src/main/java/com/example/weather/Weather.java</span><span class="tag">edit this file</span></div>
+<pre><code>package com.example.weather;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
+import java.time.LocalDate;
+
+@Entity
+public class Weather {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    private LocalDate date;
+    private Double lat;
+    private Double lon;
+    private String city;
+    private String state;
+    private Double temperature;
+
+    public Weather() {
+    }
+
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
+
+    public LocalDate getDate() { return date; }
+    public void setDate(LocalDate date) { this.date = date; }
+
+    public Double getLat() { return lat; }
+    public void setLat(Double lat) { this.lat = lat; }
+
+    public Double getLon() { return lon; }
+    public void setLon(Double lon) { this.lon = lon; }
+
+    public String getCity() { return city; }
+    public void setCity(String city) { this.city = city; }
+
+    public String getState() { return state; }
+    public void setState(String state) { this.state = state; }
+
+    public Double getTemperature() { return temperature; }
+    public void setTemperature(Double temperature) { this.temperature = temperature; }
+}</code></pre>
+
+<h4>Step 2. Repository: WeatherRepository.java (new file)</h4>
+<p>This interface has no body. By extending <code>JpaRepository&lt;Weather, Integer&gt;</code> (entity type, id type) it receives <code>save</code>, <code>findAll</code>, <code>findById</code>, <code>existsById</code> and <code>deleteById</code> for free.</p>
+<div class="file t-repo"><span class="path">src/main/java/com/example/weather/WeatherRepository.java</span><span class="tag">create this file</span></div>
+<pre><code>package com.example.weather;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface WeatherRepository extends JpaRepository&lt;Weather, Integer&gt; {
+}</code></pre>
+
+<h4>Step 3. Controller: WeatherController.java (new file)</h4>
+<p>The controller maps each of the four requests to a method and chooses the correct status code. Read each method against the table in Part 1.</p>
+<div class="file t-ctl"><span class="path">src/main/java/com/example/weather/WeatherController.java</span><span class="tag">create this file</span></div>
+<pre><code>package com.example.weather;
+
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/weather")
+public class WeatherController {
+
+    private final WeatherRepository weatherRepository;
+
+    public WeatherController(WeatherRepository weatherRepository) {
+        this.weatherRepository = weatherRepository;
+    }
+
+    // POST /weather  -&gt; 201 Created
+    @PostMapping
+    public ResponseEntity&lt;Weather&gt; create(@RequestBody Weather weather) {
+        weather.setId(null);                          // let the database choose the id
+        Weather saved = weatherRepository.save(weather);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+    }
+
+    // GET /weather  -&gt; 200 OK, sorted by id ascending
+    @GetMapping
+    public ResponseEntity&lt;List&lt;Weather&gt;&gt; getAll() {
+        List&lt;Weather&gt; all = weatherRepository.findAll(Sort.by(Sort.Direction.ASC, "id"));
+        return ResponseEntity.ok(all);
+    }
+
+    // GET /weather/{id}  -&gt; 200 OK or 404 Not Found
+    @GetMapping("/{id}")
+    public ResponseEntity&lt;Weather&gt; getById(@PathVariable Integer id) {
+        return weatherRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    // DELETE /weather/{id}  -&gt; 204 No Content or 404 Not Found
+    @DeleteMapping("/{id}")
+    public ResponseEntity&lt;Void&gt; delete(@PathVariable Integer id) {
+        if (!weatherRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        weatherRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+}</code></pre>
+
+<h4>Why it works</h4>
+<ul>
+  <li><code>@RequestBody</code> turns the incoming JSON into a <code>Weather</code> object; <code>save()</code> inserts it and returns the same object with its new <code>id</code>.</li>
+  <li><code>findById</code> returns an <code>Optional</code>, which is "a box that may be empty". <code>.map(ResponseEntity::ok)</code> wraps a found record in a 200 response and <code>.orElse(...)</code> gives a 404 when the box is empty.</li>
+  <li>The sort in <code>getAll</code> guarantees ascending id order, which the tests check.</li>
+</ul>
+</section>
+
+<!-- ============================ Q3 ============================ -->
+<section class="q" id="q3">
+<h2>Question 3: Customer and Coach REST API</h2>
+<p class="sub">Topic: two related resources, a request object (DTO) and 404 handling</p>
+
+<div class="phase"><b>Part 1. Understand the question</b></div>
+<p>A fitness app has two kinds of records. Every customer is linked to one coach, and many customers can share the same coach.</p>
+<div class="file t-res"><span class="path">Example customer JSON (response)</span><span class="tag">data format</span></div>
+<pre><code>{ "id": 1, "height": 180, "weight": 80, "coach": { "id": 1, "name": "Alex Doe" } }</code></pre>
+<div class="file t-res"><span class="path">Example coach JSON</span><span class="tag">data format</span></div>
+<pre><code>{ "id": 1, "name": "Alex Doe" }</code></pre>
+<p>Notice the difference for customers: when you <strong>send</strong> a customer you only give <code>height</code>, <code>weight</code> and <code>coach_id</code>, but when you <strong>receive</strong> one it contains the whole nested <code>coach</code> object. Because the two shapes differ, the request needs its own small class (a DTO, "data transfer object").</p>
+
+<div class="tablewrap"><table>
+<tr><th>Request</th><th>Behaviour</th><th>Response</th></tr>
+<tr><td><code>POST /api/coach</code></td><td>Body: <code>{"name": "..."}</code>. Creates a coach.</td><td>201 + created coach</td></tr>
+<tr><td><code>GET /api/coach</code></td><td>All coaches, sorted by id ascending.</td><td>200 + list</td></tr>
+<tr><td><code>GET /api/coach/{id}</code></td><td>One coach.</td><td>200 + coach, or 404</td></tr>
+<tr><td><code>POST /api/customer</code></td><td>Body: <code>{"height":..,"weight":..,"coach_id":..}</code>. Creates a customer linked to that coach.</td><td>201 + created customer</td></tr>
+<tr><td><code>GET /api/customer</code></td><td>All customers, sorted by id ascending.</td><td>200 + list</td></tr>
+<tr><td><code>GET /api/customer/{id}</code></td><td>One customer.</td><td>200 + customer, or 404</td></tr>
+</table></div>
+<p><strong>Files to create or edit:</strong> <code>CustomerRequest</code> (new DTO), <code>CoachController</code> and <code>CustomerController</code>. The entities and repositories normally come with the starter project; they are shown below so you can see how everything connects.</p>
+
+<div class="phase"><b>Part 2. The boilerplate</b></div>
+<div class="tree">src/main/java/com/example/fitness/
+  FitnessApplication.java     &lt;- main class (given)
+  Coach.java                  &lt;- entity (given)
+  Customer.java               &lt;- entity (given)
+  CoachRepository.java        &lt;- repository (given)
+  CustomerRepository.java     &lt;- repository (given)
+  CoachController.java        &lt;- EMPTY (you implement)
+  CustomerController.java     &lt;- EMPTY (you implement)
+  CustomerRequest.java        &lt;- does not exist (you create)</div>
+
+<div class="file t-ent"><span class="path">src/main/java/com/example/fitness/Coach.java</span><span class="tag">given</span></div>
+<pre><code>package com.example.fitness;
+
+import jakarta.persistence.*;
+
+@Entity
+public class Coach {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+}</code></pre>
+
+<div class="file t-ent"><span class="path">src/main/java/com/example/fitness/Customer.java</span><span class="tag">given</span></div>
+<pre><code>package com.example.fitness;
+
+import jakarta.persistence.*;
+
+@Entity
+public class Customer {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private Integer height;
+    private Integer weight;
+
+    @ManyToOne
+    @JoinColumn(name = "coach_id")
+    private Coach coach;
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public Integer getHeight() { return height; }
+    public void setHeight(Integer height) { this.height = height; }
+    public Integer getWeight() { return weight; }
+    public void setWeight(Integer weight) { this.weight = weight; }
+    public Coach getCoach() { return coach; }
+    public void setCoach(Coach coach) { this.coach = coach; }
+}</code></pre>
+<p><code>@ManyToOne</code> says "many customers belong to one coach". <code>@JoinColumn(name = "coach_id")</code> is the database column that stores the link.</p>
+
+<div class="file t-repo"><span class="path">CoachRepository.java and CustomerRepository.java</span><span class="tag">given</span></div>
+<pre><code>public interface CoachRepository extends JpaRepository&lt;Coach, Long&gt; { }
+
+public interface CustomerRepository extends JpaRepository&lt;Customer, Long&gt; { }</code></pre>
+
+<div class="file t-ctl"><span class="path">CoachController.java and CustomerController.java</span><span class="tag">starter (empty)</span></div>
+<pre><code>package com.example.fitness;
+
+public class CoachController {
+}
+
+public class CustomerController {
+}</code></pre>
+<p>(They are separate files; they are shown together here to save space.)</p>
+
+<div class="warn"><p>The field types in your starter entities (<code>Long</code>/<code>Integer</code> here) are the source of truth. If your <code>Customer</code> uses <code>Double</code> for height and weight, use the same type in the DTO below.</p></div>
+
+<div class="phase"><b>Part 3. The solution</b></div>
+
+<h4>Step 1. Request object: CustomerRequest.java (new file)</h4>
+<p>This class matches exactly what the client sends when creating a customer. <code>@JsonProperty("coach_id")</code> connects the JSON name <code>coach_id</code> to the Java field <code>coachId</code>, because Java naming style does not use underscores.</p>
+<div class="file t-dto"><span class="path">src/main/java/com/example/fitness/CustomerRequest.java</span><span class="tag">create this file</span></div>
+<pre><code>package com.example.fitness;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class CustomerRequest {
+
+    private Integer height;
+    private Integer weight;
+
+    @JsonProperty("coach_id")
+    private Long coachId;
+
+    public Integer getHeight() { return height; }
+    public void setHeight(Integer height) { this.height = height; }
+
+    public Integer getWeight() { return weight; }
+    public void setWeight(Integer weight) { this.weight = weight; }
+
+    public Long getCoachId() { return coachId; }
+    public void setCoachId(Long coachId) { this.coachId = coachId; }
+}</code></pre>
+
+<h4>Step 2. CoachController.java</h4>
+<p>Create the coach first. Customers cannot exist without a coach, so the coach endpoints are the foundation.</p>
+<div class="file t-ctl"><span class="path">src/main/java/com/example/fitness/CoachController.java</span><span class="tag">edit this file</span></div>
+<pre><code>package com.example.fitness;
+
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/coach")
+public class CoachController {
+
+    private final CoachRepository coachRepository;
+
+    public CoachController(CoachRepository coachRepository) {
+        this.coachRepository = coachRepository;
+    }
+
+    // POST /api/coach -&gt; 201 Created
+    @PostMapping
+    public ResponseEntity&lt;Coach&gt; create(@RequestBody Coach coach) {
+        coach.setId(null);
+        Coach saved = coachRepository.save(coach);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+    }
+
+    // GET /api/coach -&gt; 200 OK, sorted by id ascending
+    @GetMapping
+    public ResponseEntity&lt;List&lt;Coach&gt;&gt; getAll() {
+        return ResponseEntity.ok(coachRepository.findAll(Sort.by(Sort.Direction.ASC, "id")));
+    }
+
+    // GET /api/coach/{id} -&gt; 200 OK or 404 Not Found
+    @GetMapping("/{id}")
+    public ResponseEntity&lt;Coach&gt; getById(@PathVariable Long id) {
+        return coachRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+}</code></pre>
+
+<h4>Step 3. CustomerController.java</h4>
+<p>The only new idea is in <code>create</code>. The client sends only a <code>coach_id</code> number, so the controller must look up the real <code>Coach</code> object, attach it to the customer and then save. If that coach does not exist, the request is invalid and the method answers 400 without saving anything.</p>
+<div class="file t-ctl"><span class="path">src/main/java/com/example/fitness/CustomerController.java</span><span class="tag">edit this file</span></div>
+<pre><code>package com.example.fitness;
+
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
+
+@RestController
+@RequestMapping("/api/customer")
+public class CustomerController {
+
+    private final CustomerRepository customerRepository;
+    private final CoachRepository coachRepository;
+
+    public CustomerController(CustomerRepository customerRepository,
+                              CoachRepository coachRepository) {
+        this.customerRepository = customerRepository;
+        this.coachRepository = coachRepository;
+    }
+
+    // POST /api/customer -&gt; 201 Created (400 if coach_id is missing or unknown)
+    @PostMapping
+    public ResponseEntity&lt;Customer&gt; create(@RequestBody CustomerRequest request) {
+        if (request.getCoachId() == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        Optional&lt;Coach&gt; coach = coachRepository.findById(request.getCoachId());
+        if (coach.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        Customer customer = new Customer();
+        customer.setHeight(request.getHeight());
+        customer.setWeight(request.getWeight());
+        customer.setCoach(coach.get());
+
+        Customer saved = customerRepository.save(customer);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+    }
+
+    // GET /api/customer -&gt; 200 OK, sorted by id ascending
+    @GetMapping
+    public ResponseEntity&lt;List&lt;Customer&gt;&gt; getAll() {
+        return ResponseEntity.ok(customerRepository.findAll(Sort.by(Sort.Direction.ASC, "id")));
+    }
+
+    // GET /api/customer/{id} -&gt; 200 OK or 404 Not Found
+    @GetMapping("/{id}")
+    public ResponseEntity&lt;Customer&gt; getById(@PathVariable Long id) {
+        return customerRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+}</code></pre>
+
+<h4>Why it works</h4>
+<ul>
+  <li>The response contains the nested <code>coach</code> object because the <code>Customer</code> entity holds a <code>Coach</code>; the request uses <code>CustomerRequest</code> so the client can send just <code>coach_id</code>.</li>
+  <li>Both controllers receive their repositories through the constructor. Spring supplies them automatically (this is called dependency injection).</li>
+  <li>The choice of 400 for an unknown <code>coach_id</code> is deliberate: the URL itself is fine, but the data inside the request is not. A 404 is reserved for "the id in the URL does not exist".</li>
+</ul>
+</section>
+
+<!-- ============================ Pitfalls ============================ -->
+<section class="q" id="pitfalls">
+<h2>Common mistakes and how to test</h2>
+
+<h3>Mistakes to look for when a test fails</h3>
+<div class="tablewrap"><table>
+<tr><th>Symptom</th><th>Likely cause</th></tr>
+<tr><td><code>NoSuchBeanDefinitionException</code> (Q1)</td><td>The bean name differs from the one in the table, or the XML file is not loaded with <code>@ImportResource</code>.</td></tr>
+<tr><td>Application fails to start with "bean already defined" (Q1)</td><td>Bean #3 was defined twice (both <code>@Component</code> and <code>@Bean</code>).</td></tr>
+<tr><td>404 on every request</td><td>Missing <code>@RestController</code>, wrong <code>@RequestMapping</code> path, or the class is outside the main class's package.</td></tr>
+<tr><td>POST returns 200 instead of 201</td><td>Returned the object directly. Use <code>ResponseEntity.status(HttpStatus.CREATED)</code>.</td></tr>
+<tr><td>Fields come back <code>null</code></td><td>Missing getters/setters, or the field name does not match the JSON key.</td></tr>
+<tr><td>Delete of a missing id returns 204 (Q2)</td><td>Check <code>existsById</code> before deleting, as in the solution.</td></tr>
+<tr><td>Lists come back in the wrong order</td><td>Use <code>findAll(Sort.by(Sort.Direction.ASC, "id"))</code>, not plain <code>findAll()</code>.</td></tr>
+<tr><td><code>package jakarta.persistence does not exist</code></td><td>Your project is Spring Boot 2. Use <code>javax.persistence</code> instead.</td></tr>
+</table></div>
+
+<h3>Try it by hand</h3>
+<p>Start the app with <code>mvn spring-boot:run</code> (it listens on port 8080) and use these commands, or the same requests in Postman.</p>
+<div class="file t-res"><span class="path">Terminal</span><span class="tag">Q2 weather</span></div>
+<pre><code>curl -i -X POST localhost:8080/weather -H "Content-Type: application/json" \
+  -d '{"date":"1985-01-01","lat":36.1189,"lon":-86.6892,"city":"Nashville","state":"Tennessee","temperature":17.3}'
+
+curl -i localhost:8080/weather
+curl -i localhost:8080/weather/1
+curl -i -X DELETE localhost:8080/weather/1
+curl -i localhost:8080/weather/1            # now returns 404</code></pre>
+<div class="file t-res"><span class="path">Terminal</span><span class="tag">Q3 fitness</span></div>
+<pre><code>curl -i -X POST localhost:8080/api/coach -H "Content-Type: application/json" -d '{"name":"Alex Doe"}'
+
+curl -i -X POST localhost:8080/api/customer -H "Content-Type: application/json" \
+  -d '{"height":180,"weight":80,"coach_id":1}'
+
+curl -i localhost:8080/api/customer
+curl -i localhost:8080/api/customer/99      # returns 404</code></pre>
+<p>Finally, run the provided unit tests with <code>mvn test</code>. All tests passing is the goal of each question.</p>
+</section>
+
+</div>
+
+<script>
+document.querySelectorAll('.file').forEach(function(bar){
+  var pre = bar.nextElementSibling;
+  if(!pre || pre.tagName !== 'PRE') return;
+  var btn = document.createElement('button');
+  btn.type = 'button';
+  btn.textContent = 'Copy';
+  btn.addEventListener('click', function(){
+    var text = pre.innerText;
+    var done = function(){ btn.textContent = 'Copied'; setTimeout(function(){ btn.textContent = 'Copy'; }, 1400); };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done, function(){});
+    }
+  });
+  bar.insertBefore(btn, bar.querySelector('.tag'));
+});
+</script>
+</body>
+</html>
