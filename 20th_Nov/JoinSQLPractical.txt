@@ -1,0 +1,343 @@
+Enter password: *************
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 44
+Server version: 8.0.32 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2023, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> SHOW DATABASES;
++--------------------+
+| Database           |
++--------------------+
+| a                  |
+| advance            |
+| advanced           |
+| aggregate          |
+| brharneclg         |
+| cg                 |
+| college_db         |
+| college_db5        |
+| d                  |
+| db                 |
+| dd                 |
+| demo               |
+| ds                 |
+| e                  |
+| emp                |
+| employee           |
+| excelr             |
+| ghr                |
+| information_schema |
+| infotech           |
+| ittraining         |
+| j                  |
+| jdbcdb             |
+| joins              |
+| jumbo              |
+| mydb               |
+| mysql              |
+| new_mydb           |
+| operator           |
+| p                  |
+| performance_schema |
+| pmis               |
+| practicals         |
+| pvg1               |
+| q                  |
+| qk                 |
+| schooldb           |
+| sep26              |
+| sia                |
+| spdc               |
+| sys                |
+| t                  |
+| tasgaonkarcollege  |
+| tech               |
+| techberry          |
+| tesdb              |
+| test1              |
+| test2              |
+| test3              |
+| testdb             |
+| vppcoe             |
+| watumull           |
++--------------------+
+52 rows in set (0.17 sec)
+
+mysql> CREATE DATABASE JOIN;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'JOIN' at line 1
+mysql> CREATE DATABASE D;
+ERROR 1007 (HY000): Can't create database 'd'; database exists
+mysql> CREATE DATABASE DB5;
+Query OK, 1 row affected (0.08 sec)
+
+mysql> SHOW DATABASES;
++--------------------+
+| Database           |
++--------------------+
+| a                  |
+| advance            |
+| advanced           |
+| aggregate          |
+| brharneclg         |
+| cg                 |
+| college_db         |
+| college_db5        |
+| d                  |
+| db                 |
+| db5                |
+| dd                 |
+| demo               |
+| ds                 |
+| e                  |
+| emp                |
+| employee           |
+| excelr             |
+| ghr                |
+| information_schema |
+| infotech           |
+| ittraining         |
+| j                  |
+| jdbcdb             |
+| joins              |
+| jumbo              |
+| mydb               |
+| mysql              |
+| new_mydb           |
+| operator           |
+| p                  |
+| performance_schema |
+| pmis               |
+| practicals         |
+| pvg1               |
+| q                  |
+| qk                 |
+| schooldb           |
+| sep26              |
+| sia                |
+| spdc               |
+| sys                |
+| t                  |
+| tasgaonkarcollege  |
+| tech               |
+| techberry          |
+| tesdb              |
+| test1              |
+| test2              |
+| test3              |
+| testdb             |
+| vppcoe             |
+| watumull           |
++--------------------+
+53 rows in set (0.01 sec)
+
+mysql> USE DB5;
+Database changed
+mysql> CREATE TABLE EMPLOYEES
+    -> (EMP_ID INT PRIMARY KEY,
+    -> NAME VARCHAR(50),
+    -> DEPT_ID INT
+    -> );
+Query OK, 0 rows affected (0.21 sec)
+
+mysql> INSERT INTO EMPLOYEES VALUES(1,"ALICE",101);
+Query OK, 1 row affected (0.03 sec)
+
+mysql> INSERT INTO EMPLOYEES VALUES(2,"BOB",102);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> INSERT INTO EMPLOYEES VALUES(3,"CHARLIE",103);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> INSERT INTO EMPLOYEES VALUES(4,"DAVID",NULL);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> SELECT * FROM EMPLOYEES;
++--------+---------+---------+
+| EMP_ID | NAME    | DEPT_ID |
++--------+---------+---------+
+|      1 | ALICE   |     101 |
+|      2 | BOB     |     102 |
+|      3 | CHARLIE |     103 |
+|      4 | DAVID   |    NULL |
++--------+---------+---------+
+4 rows in set (0.00 sec)
+
+mysql> CREATE TABLE DEPARTMENTS
+    -> (
+    -> DEPT_ID INT,
+    -> DEPT_NAME
+    -> );
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ')' at line 5
+mysql> CREATE TABLE DEPARTMENTS
+    -> (
+    -> DEPT_ID INT,
+    -> DEPT_NAME VARCHAR(50)
+    -> );
+Query OK, 0 rows affected (0.05 sec)
+
+mysql> INSERT INTO DEPARTMENTS VALUES(101,"HR");
+Query OK, 1 row affected (0.01 sec)
+
+mysql> INSERT INTO DEPARTMENTS VALUES(102,"IT");
+Query OK, 1 row affected (0.01 sec)
+
+mysql> INSERT INTO DEPARTMENTS VALUES(104,"FINANCE");
+Query OK, 1 row affected (0.01 sec)
+
+mysql> SELECT * FROM EMPLOYEES;
++--------+---------+---------+
+| EMP_ID | NAME    | DEPT_ID |
++--------+---------+---------+
+|      1 | ALICE   |     101 |
+|      2 | BOB     |     102 |
+|      3 | CHARLIE |     103 |
+|      4 | DAVID   |    NULL |
++--------+---------+---------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT * FROM DEPARTMENTS;
++---------+-----------+
+| DEPT_ID | DEPT_NAME |
++---------+-----------+
+|     101 | HR        |
+|     102 | IT        |
+|     104 | FINANCE   |
++---------+-----------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT EMP_ID,NAME,DEPT_NAME FROM EMPLOYEES
+    -> INNER JOIN DEPARTMENTS
+    -> ON EMPLOYEES.DEPT_ID=DEPARTMENTS.DEPT_ID;
++--------+-------+-----------+
+| EMP_ID | NAME  | DEPT_NAME |
++--------+-------+-----------+
+|      1 | ALICE | HR        |
+|      2 | BOB   | IT        |
++--------+-------+-----------+
+2 rows in set (0.01 sec)
+
+mysql> SELECT EMP_ID,NAME,DEPT_NAME
+    -> FROM EMPLOYEES
+    -> LEFT JOIN DEPARTMENTS
+    -> ON EMPLOYEES.DEPT_ID=DEPARTMENTS.DEPT_ID;
++--------+---------+-----------+
+| EMP_ID | NAME    | DEPT_NAME |
++--------+---------+-----------+
+|      1 | ALICE   | HR        |
+|      2 | BOB     | IT        |
+|      3 | CHARLIE | NULL      |
+|      4 | DAVID   | NULL      |
++--------+---------+-----------+
+4 rows in set (0.01 sec)
+
+mysql> SELECT EMP_ID,NAME,DEPT_NAME
+    -> FROM EMPLOYEES
+    -> RIGHT JOIN DEPARTMENTS
+    -> ON EMPLOYEES.DEPT_ID=DEPARTMENTS.DEPT_ID;
++--------+-------+-----------+
+| EMP_ID | NAME  | DEPT_NAME |
++--------+-------+-----------+
+|      1 | ALICE | HR        |
+|      2 | BOB   | IT        |
+|   NULL | NULL  | FINANCE   |
++--------+-------+-----------+
+3 rows in set (0.01 sec)
+
+mysql> SELECT EMP_ID,NAME,DEPT_NAME
+    -> FROM EMPLOYEES
+    -> LEFT JOIN DEPARTMENTS
+    -> ON EMPLOYEES.DEPT_ID=DEPARTMENT.DEPT_ID
+    ->
+    -> UNION
+    ->
+    -> SELECT EMP_ID,NAME,DEPT_NAME
+    -> FROM EMPLOYEES
+    -> RIGHT JOIN DEPARTMENTS
+    -> ON EMPLOYEES.DEPT_ID=DEPARTMENT.DEPT_ID;
+ERROR 1054 (42S22): Unknown column 'DEPARTMENT.DEPT_ID' in 'on clause'
+mysql> SELECT EMP_ID,NAME,DEPT_NAME
+    -> FROM EMPLOYEES
+    -> LEFT JOIN DEPARTMENTS
+    -> ON EMPLOYEES.DEPT_ID=DEPARTMENTS.DEPT_ID
+    ->
+    -> UNION
+    ->
+    -> SELECT EMP_ID,NAME,DEPT_NAME
+    -> FROM EMPLOYEES
+    -> RIGHT JOIN DEPARTMENTS
+    -> ON EMPLOYEES.DEPT_ID=DEPARTMENTS.DEPT_ID;
++--------+---------+-----------+
+| EMP_ID | NAME    | DEPT_NAME |
++--------+---------+-----------+
+|      1 | ALICE   | HR        |
+|      2 | BOB     | IT        |
+|      3 | CHARLIE | NULL      |
+|      4 | DAVID   | NULL      |
+|   NULL | NULL    | FINANCE   |
++--------+---------+-----------+
+5 rows in set (0.01 sec)
+
+mysql> SELECT * EMPLOYEES;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'EMPLOYEES' at line 1
+mysql> SELECT * FROM EMPLOYEES;
++--------+---------+---------+
+| EMP_ID | NAME    | DEPT_ID |
++--------+---------+---------+
+|      1 | ALICE   |     101 |
+|      2 | BOB     |     102 |
+|      3 | CHARLIE |     103 |
+|      4 | DAVID   |    NULL |
++--------+---------+---------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT * FROM DEPARTMENTS;
++---------+-----------+
+| DEPT_ID | DEPT_NAME |
++---------+-----------+
+|     101 | HR        |
+|     102 | IT        |
+|     104 | FINANCE   |
++---------+-----------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT NAME,DEPT_NAME
+    -> FROM EMPLOYEE
+    -> CROSS JOIN DEPRATMENTS;
+ERROR 1146 (42S02): Table 'db5.employee' doesn't exist
+mysql> SELECT NAME,DEPT_NAME
+    -> FROM EMPLOYEES
+    -> CROSS JOIN DEPRATMENTS;
+ERROR 1146 (42S02): Table 'db5.depratments' doesn't exist
+mysql> SELECT NAME,DEPT_NAME
+    -> FROM EMPLOYEE
+    -> CROSS JOIN DEPARTMENTS;
+ERROR 1146 (42S02): Table 'db5.employee' doesn't exist
+mysql> SELECT NAME,DEPT_NAME
+    -> FROM EMPLOYEES
+    -> CROSS JOIN DEPARTMENTS;
++---------+-----------+
+| NAME    | DEPT_NAME |
++---------+-----------+
+| ALICE   | FINANCE   |
+| ALICE   | IT        |
+| ALICE   | HR        |
+| BOB     | FINANCE   |
+| BOB     | IT        |
+| BOB     | HR        |
+| CHARLIE | FINANCE   |
+| CHARLIE | IT        |
+| CHARLIE | HR        |
+| DAVID   | FINANCE   |
+| DAVID   | IT        |
+| DAVID   | HR        |
++---------+-----------+
+12 rows in set (0.00 sec)
+
+mysql>
